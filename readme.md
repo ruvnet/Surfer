@@ -59,7 +59,7 @@ By following the specifications and hosting requirements, developers can create 
 
 ## Building the AI Surfer Plugin
 ### Structure
-'''
+```
 /main.py                  # The main Python script that runs the FastAPI application and defines the endpoints
 /plugins/ai-plugin.json   # The ChatGPT plugin manifest file containing metadata and API specification details
 /plugins/logo.jpg         # The logo image file for the plugin, referenced in the manifest file
@@ -68,8 +68,7 @@ By following the specifications and hosting requirements, developers can create 
 /templates/summary.html   # The HTML template for displaying the summarized content to the user
 /readme.md                # The README file containing documentation and instructions for using the plugin
 /requirements.txt         # The file listing the Python dependencies required to run the application
-
-'''
+```
 ### Step 1: Setting Up the Environment
 To build the AI Surfer plugin, we'll use Python and the FastAPI framework. We'll also use libraries such as openai, requests, bs4 (BeautifulSoup), spacy, and httpx. Make sure to install these libraries and set up your environment.
 
