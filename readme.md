@@ -114,3 +114,16 @@ Once deployed, you can access the AI Surfer plugin using the provided URL and st
 In this blog post, we explored how to build a ChatGPT plugin called AI Surfer that allows ChatGPT to surf the internet and summarize articles. We discussed the implementation details, including fetching HTML content, extracting text, generating summaries using GPT-3.5 Turbo, and deploying the plugin to Replit.
 
 Building ChatGPT plugins is an exciting way to extend the capabilities of ChatGPT and provide users with new functionalities. Whether you're summarizing articles, translating text, or fetching
+
+# Appendix
+## FastAPI 
+
+FastAPI is a modern, fast (high-performance) web framework for building APIs with Python. It is designed to be easy to use, while also providing high performance and robustness. FastAPI is built on top of Starlette for web routing and Pydantic for data validation and serialization. It offers a wide range of features, including automatic generation of OpenAPI and JSON Schema documentation, dependency injection, OAuth2 and JWT authentication, and more.
+
+In the AI Web Surfer plugin, FastAPI is used to create the web application and API endpoints that interact with OpenAI's GPT-3.5 Turbo language model. The plugin leverages FastAPI's asynchronous capabilities to efficiently handle concurrent requests and summarize long articles. FastAPI's automatic generation of OpenAPI documentation is also utilized to expose the API specification for the plugin, making it compatible with ChatGPT's plugin system.
+
+One of the key benefits of using FastAPI is its comprehensive and well-organized documentation. The official FastAPI documentation provides detailed explanations, code examples, and best practices for building web applications and APIs. Whether you are a beginner or an experienced developer, the documentation is a valuable resource for learning how to use FastAPI effectively.
+
+To explore the FastAPI documentation and learn more about its features, you can visit the official website: https://fastapi.tiangolo.com/
+
+In summary, FastAPI is a powerful and versatile web framework that plays a crucial role in building the AI Web Surfer plugin. By using FastAPI, developers can create high-performance web applications and APIs that seamlessly integrate with ChatGPT and other AI language models.
