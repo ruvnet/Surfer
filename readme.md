@@ -1,4 +1,7 @@
 # Building a ChatGPT Plugin: AI Web Surfer
+<div align="right">
+<img src="https://raw.githubusercontent.com/ruvnet/Surfer/main/assets/screen-shot.png">
+</div>
 
 ## Introduction
 ChatGPT plugins are a powerful way to extend the capabilities of the ChatGPT language model by integrating external APIs and services. In this blog post, we'll explore how to build a ChatGPT plugin called "AI Surfer" that allows ChatGPT to surf the internet, summarize articles, and limit token counts using concurrent API connections. We'll also discuss how to deploy the plugin to Replit for free or to other cloud services.
