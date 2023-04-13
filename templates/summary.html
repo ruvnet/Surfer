@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Summary">
+    <meta property="og:description" content="{{ summary }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="article">
+    <title>Summary</title>
+</head>
+<body>
+    <h1>Summary: {{ request.url }}</h1>
+    <p>{{ summary }}</p>
+</body>
+</html>

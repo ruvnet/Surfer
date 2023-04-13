@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Summarizer</title>
+    <!-- Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Product Hunt-style header -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 text-center">
+                <h1>URL Summarizer</h1>
+                <p class="lead">Summarize any URL in seconds!</p>
+              <form id="summarize-form">
+    <div class="form-group">
+        <input type="text" class="form-control input-lg" id="url-input" placeholder="Enter a URL...">
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg">Summarize</button>
+</form>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS link -->
+<script>
+    document.getElementById('summarize-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const urlInput = document.getElementById('url-input');
+        const url = urlInput.value;
+        
+        if (!url) {
+            alert('Please enter a URL');
+            return;
+        }
+        
+        const response = await fetch('/api/summarize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: url })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            // Redirect to the /summary endpoint with the summary as a query parameter
+            window.location.href = `/summary?summary=${encodeURIComponent(data.summary)}`;
+        } else {
+            alert('Error: Unable to summarize the URL');
+        }
+    });
+</script>
+</body>
+</html>

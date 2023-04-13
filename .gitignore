@@ -1,0 +1,17 @@
+# Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Replit files
+.replit
+.replit_history
+.replit_user_data
+
+# Environments
+.env
+*.env
+
+# Flask sessions
+instance/

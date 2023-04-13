@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "AI Surfer",
+  "name_for_model": "ai_surfer",
+  "description_for_human": "An Ai Prompt Programming plugin that allows users to surf the web in ChatGPT.",
+  "description_for_model": "This plugin allows you to interact with the AI Surfer web, including surfing any site. You can read the root, summarize URLs, and display summaries.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://surfer.ruvnet.repl.co/.well-known/openapi.yaml",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://surfer.ruvnet.repl.co/.well-known/logo.jpg",
+  "contact_email": "ruv@ruv.net",
+  "legal_info_url": "https://surfer.ruvnet.repl.co/legal"
+}
