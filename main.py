@@ -1,3 +1,8 @@
+#              - Ai Surfer 
+#     /\__/\   - main.py 
+#    ( o.o  )  - v0.0.1
+#      >^<     - by @rUv
+
 # Import the necessary modules and libraries
 import os               # Provides access to operating system-dependent functionality
 import openai           # OpenAI's GPT-3 language model library
