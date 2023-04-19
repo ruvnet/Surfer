@@ -96,7 +96,7 @@ The OpenAPI specification documents the API endpoints of the plugin. It defines 
 ### Step 6: Deploying the Plugin
 The AI Surfer plugin can be deployed to Replit for free or to other cloud services. Make sure to set up environment variables (e.g., OpenAI API key) and configure the domain name in the manifest file.
 
-## Buidl
+## Build
 Building a ChatGPT plugin is a great way to extend the capabilities of ChatGPT and provide users with new and exciting functionalities. The AI Surfer plugin is just one example of how plugins can be used to enhance the ChatGPT experience. Whether you're a beginner or an experienced developer, building ChatGPT plugins is a rewarding and creative endeavor.
 
 For more information on ChatGPT plugins, including authentication options, manifest fields, and OpenAPI specifications, please refer to the official ChatGPT plugin documentation. 
