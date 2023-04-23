@@ -26,8 +26,10 @@ ChatGPT: Sure, let me retrieve the information for you.
 {
   "repo_id": "EleutherAI/gpt-neo-2.7B"
 }
+```
 
 ## Example 2: List Datasets with Filtering
+```
 User: Can you list the datasets on Hugging Face created by the author "huggingface" and related to text classification?
 ChatGPT: Of course, let me fetch the list of datasets for you.
 [Plugin: Hugging Face API]
@@ -35,10 +37,11 @@ ChatGPT: Of course, let me fetch the list of datasets for you.
   "author": "huggingface",
   "filter": "task_categories:text-classification"
 }
-
+```
 ## Example 3: Create a New Space
 User: I want to create a new space on Hugging Face called "test-space" using Streamlit. It should be public.
 ChatGPT: Sure, I'll create the space for you.
+```
 [Plugin: Hugging Face API]
 {
   "type": "space",
@@ -46,18 +49,19 @@ ChatGPT: Sure, I'll create the space for you.
   "private": false,
   "sdk": "streamlit"
 }
-
+```
 ## Example 4: Delete a Repository
 User: I want to delete the space "test-space2" on Hugging Face.
 ChatGPT: Are you sure you want to delete the space "test-space2"? This action cannot be undone.
 User: Yes, I'm sure.
 ChatGPT: Alright, I'll proceed with deleting the space.
+```
 [Plugin: Hugging Face API]
 {
   "type": "space",
   "repo_id": "username/test-space2"
 }
-
+```
 ## Installation Instructions
 To use the Hugging Face API plugin, you need to have the plugin code hosted on a server and accessible via an API endpoint. The plugin code should include the necessary routes and functions to handle the interactions with the Hugging Face platform.
 
