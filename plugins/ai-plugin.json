@@ -1,18 +1,18 @@
 {
   "schema_version": "v1",
-  "name_for_human": "AI Surfer",
-  "name_for_model": "ai_surfer",
-  "description_for_human": "An Ai Prompt Programming plugin that allows users to surf the web in ChatGPT.",
-  "description_for_model": "This plugin allows you to interact with the AI Surfer web, including surfing any site. You can read the root, summarize URLs, and display summaries.",
-  "auth": {
+  "name_for_human": "Hugging Face API Plugin",
+  "name_for_model": "huggingface_api",
+  "description_for_human": "An AI Prompt Programming plugin that allows users to interact with Hugging Face models and services.",
+  "description_for_model": "This plugin allows you to interact with Hugging Face models and services, including listing models, getting model information, and performing inference.",
+    "auth": {
     "type": "none"
   },
   "api": {
     "type": "openapi",
-    "url": "https://surfer.ruvnet.repl.co/.well-known/openapi.yaml",
+    "url": "https://yourdomain.com/openapi.json",
     "is_user_authenticated": false
   },
-  "logo_url": "https://surfer.ruvnet.repl.co/.well-known/logo.jpg",
-  "contact_email": "ruv@ruv.net",
-  "legal_info_url": "https://surfer.ruvnet.repl.co/legal"
+  "logo_url": "https://yourdomain.com/.well-known/logo.jpg",
+  "contact_email": "x@x.net",
+  "legal_info_url": "https://yourdomain.com/legal"
 }

@@ -1,132 +1,84 @@
-# Building a ChatGPT Plugin: AI Web Surfer
-<div align="right">
-<img src="https://raw.githubusercontent.com/ruvnet/Surfer/main/assets/screen-shot.png">
-</div>
-
-### Built using my ChatGPT Plugin Bot.
-Plugin Creator Bot. https://github.com/ruvnet/Bot-Generator-Bot/blob/main/prompts/chatgpt-plugin-generator.txt
+# ChatGPT Hugging Face API Plugin
 
 ## Introduction
-ChatGPT plugins are a powerful way to extend the capabilities of the ChatGPT language model by integrating external APIs and services. In this blog post, we'll explore how to build a ChatGPT plugin called "AI Surfer" that allows ChatGPT to surf the internet, summarize articles, and limit token counts using concurrent API connections. We'll also discuss how to deploy the plugin to Replit for free or to other cloud services.
+Hugging Face is a platform that provides a wide range of natural language processing (NLP) models, datasets, and tools. With the Hugging Face API plugin, you can seamlessly integrate the capabilities of the Hugging Face platform into ChatGPT. This plugin allows ChatGPT to interact with Hugging Face models, datasets, and spaces, enabling a variety of NLP tasks such as text classification, language translation, summarization, and more.
 
-## What are ChatGPT Plugins?
-ChatGPT plugins are integrations that allow ChatGPT to interact with external APIs, databases, or services. By using plugins, ChatGPT can perform tasks such as fetching data, summarizing articles, translating text, and much more. Plugins are defined using a manifest file (ai-plugin.json) and an OpenAPI specification (specification.yaml) that describe the plugin's metadata, authentication, and API endpoints.
+## Use Cases
+- Model Information Retrieval: Use the plugin to retrieve information about specific models hosted on the Hugging Face platform.
+- Dataset Exploration: Access and explore the datasets hosted on Hugging Face.
+- Retrieve information about specific datasets and their metadata.
+- Space Management: Create, access, and manage Hugging Face Spaces through natural language interactions with ChatGPT.
+- Model Deployment: Deploy your NLP models to Hugging Face and manage them using the plugin.
 
-## AI Surfer Plugin: Overview
-The AI Surfer plugin empowers ChatGPT to "surf" the internet by summarizing the content of web pages provided by users. By inputting a URL, the plugin leverages OpenAI's GPT-3.5 Turbo language model to generate concise and informative summaries of the web page's content. The plugin's key features and benefits include:
+## Benefits of the Hugging Face API Plugin
+- Manage Models and Datasets: The plugin allows you to manage your Hugging Face models and datasets through natural language interactions with ChatGPT. You can retrieve information about specific models, list datasets, and perform other management tasks.
+- Interact with Hugging Face Spaces: Hugging Face Spaces are interactive web applications that showcase models and datasets. The plugin enables you to create, access, and manage these spaces.
+- Convenient and Intuitive: The plugin provides a convenient and intuitive way to interact with the Hugging Face platform. Users can perform complex tasks using simple natural language commands.
+- Enhanced Capabilities: By integrating the Hugging Face platform into ChatGPT, you can enhance the language model's capabilities, allowing users to leverage the vast collection of models and resources available on Hugging Face.
 
-- **Web Content Summarization**: The AI Surfer plugin can distill the essential information from articles, blog posts, and other web content, providing users with quick and easy-to-understand summaries.
+## How to Use Examples
 
-- **Concurrent API Connections**: To efficiently handle long articles and reduce token counts, the plugin uses concurrent API connections to process and summarize different sections of the content simultaneously.
+### Example 1: Retrieve Information About a Model
+```markdown
+User: Tell me about the GPT-Neo 2.7B model on Hugging Face.
+ChatGPT: Sure, let me retrieve the information for you.
+[Plugin: Hugging Face API]
+{
+  "repo_id": "EleutherAI/gpt-neo-2.7B"
+}
 
-- **Language Model Integration**: The plugin integrates with OpenAI's GPT-3.5 Turbo language model, harnessing its natural language processing capabilities to produce high-quality summaries.
+## Example 2: List Datasets with Filtering
+User: Can you list the datasets on Hugging Face created by the author "huggingface" and related to text classification?
+ChatGPT: Of course, let me fetch the list of datasets for you.
+[Plugin: Hugging Face API]
+{
+  "author": "huggingface",
+  "filter": "task_categories:text-classification"
+}
 
-- **Adjustability and Flexibility**: The plugin is fully adjustable, allowing developers to customize its behavior and output to suit specific use cases.
+## Example 3: Create a New Space
+User: I want to create a new space on Hugging Face called "test-space" using Streamlit. It should be public.
+ChatGPT: Sure, I'll create the space for you.
+[Plugin: Hugging Face API]
+{
+  "type": "space",
+  "name": "test-space",
+  "private": false,
+  "sdk": "streamlit"
+}
 
-- **Deployment Options**: The AI Surfer plugin can be deployed to various cloud services, including Replit, AWS, Heroku, and more, providing flexibility in hosting and scalability.
+## Example 4: Delete a Repository
+User: I want to delete the space "test-space2" on Hugging Face.
+ChatGPT: Are you sure you want to delete the space "test-space2"? This action cannot be undone.
+User: Yes, I'm sure.
+ChatGPT: Alright, I'll proceed with deleting the space.
+[Plugin: Hugging Face API]
+{
+  "type": "space",
+  "repo_id": "username/test-space2"
+}
 
-By enabling ChatGPT to summarize web content, the AI Surfer plugin enhances the language model's capabilities, allowing users to quickly access and understand information from across the web.
+## Installation Instructions
+To use the Hugging Face API plugin, you need to have the plugin code hosted on a server and accessible via an API endpoint. The plugin code should include the necessary routes and functions to handle the interactions with the Hugging Face platform.
 
-## Introduction to OpenAI Plugin Creation and Specifications
+1. Clone or download the plugin code from the repository.
+2. Install the required dependencies for the plugin (e.g., FastAPI, httpx).
+3. Set up the environment variables for the Hugging Face API key and base URL.
+4. Host the plugin code on a server or platform of your choice (e.g., Replit, Heroku, AWS).
+5. Ensure that the API endpoints are accessible and functioning correctly.
 
-OpenAI's ChatGPT plugins provide a powerful way to extend the capabilities of the ChatGPT language model by integrating it with external APIs and services. By creating plugins, developers can enable ChatGPT to perform a wide range of tasks, such as fetching data from external sources, summarizing articles, translating text, and much more.
-
-To create a ChatGPT plugin, developers need to provide a plugin manifest file that includes metadata about the plugin, authentication details, and an API specification. The manifest file is a JSON file that follows a specific schema defined by OpenAI. The API specification is typically provided in the OpenAPI (Swagger) format, which describes the endpoints and operations that the plugin can perform.
+## ChatGPT Plugin Creation and Specifications
+To create a ChatGPT plugin, you need to provide a plugin manifest file and an OpenAPI specification. The manifest file includes metadata about the plugin, authentication details, and the API specification. The OpenAPI specification describes the available endpoints, operations, parameters, and responses that the plugin can perform.
 
 ### Plugin Manifest
-
-The plugin manifest is a JSON file named `ai-plugin.json` that must be hosted in a publicly accessible location on the developer's server under the `.well-known` directory (e.g., `https://example.com/.well-known/ai-plugin.json`). The manifest file contains the following key fields:
-
-- `schema_version`: The manifest schema version (e.g., `"v1"`).
-- `name_for_human`: A human-readable name for the plugin, such as the full company name.
-- `name_for_model`: A name that the ChatGPT model will use to target the plugin.
-- `description_for_human`: A human-readable description of the plugin.
-- `description_for_model`: A description tailored to the model, such as token context length considerations.
-- `auth`: An object describing the authentication schema for the plugin (e.g., `"none"`, `"user_http"`, `"service_http"`, `"oauth"`).
-- `api`: An object describing the API specification, including the type (e.g., `"openapi"`) and the URL to the OpenAPI specification file.
-- `logo_url`: A URL used to fetch the plugin's logo (optional).
-- `contact_email`: An email contact for safety/moderation reachout, support, and deactivation (optional).
-- `legal_info_url`: A URL for users to view plugin information (optional).
+Located in /plugins/ The plugin manifest is a JSON file named `ai-plugin.json` that must be hosted in a publicly accessible location on your server under the `.well-known` directory (e.g., `https://example.com/.well-known/ai-plugin.json`). The manifest file contains key fields such as `schema_version`, `name_for_human`, `name_for_model`, `description_for_human`, `description_for_model`, `auth`, `api`, `logo_url`, `contact_email`, and `legal_info_url`.
 
 ### API Specification
+The API specification is a YAML or JSON file that follows the OpenAPI (Swagger) format. It describes the available endpoints, operations, parameters, and responses that the plugin can perform. The API specification file must be hosted on your server and referenced in the plugin manifest's `api` field.
 
-The API specification is a YAML or JSON file that follows the OpenAPI (Swagger) format. It describes the available endpoints, operations, parameters, and responses that the plugin can perform. The API specification file must also be hosted on the developer's server and referenced in the plugin manifest's `api` field.
+The OpenAPI specification serves as a wrapper that sits on top of your API, allowing ChatGPT to understand and interact with the API. You can choose which endpoints and operations to expose to ChatGPT, providing control over the plugin's functionality.
 
-The OpenAPI specification serves as a wrapper that sits on top of the developer's API, allowing ChatGPT to understand and interact with the API. Developers can choose which endpoints and operations to expose to ChatGPT, providing control over the plugin's functionality.
+## Getting Started with the Hugging Face API Plugin
+To get started with the Hugging Face API plugin, follow the installation instructions and set up the plugin on your server. Once the plugin is accessible via the API endpoints, you can start interacting with ChatGPT to manage your Hugging Face data and models. Use the provided examples as a starting point and explore the various features and capabilities of the plugin.
 
-### Hosting the Plugin
-
-To deploy a ChatGPT plugin, developers need to host both the `ai-plugin.json` manifest file and the OpenAPI specification file on their server. These files must be publicly accessible and placed in the appropriate directories (e.g., `.well-known` for the manifest file). Developers can use various hosting services, such as AWS, Heroku, Replit, or their own servers, to host the plugin files.
-
-Once the plugin is deployed and the files are hosted, developers can submit the plugin to OpenAI for review and approval. Once approved, the plugin becomes available for use by ChatGPT and its users.
-
-By following the specifications and hosting requirements, developers can create and deploy powerful plugins that enhance the capabilities of ChatGPT and provide users with new and exciting functionalities.
-
-
-## Building the AI Surfer Plugin
-### Structure
-```
-/main.py                  # The main Python script that runs the FastAPI application and defines the endpoints
-/plugins/ai-plugin.json   # The ChatGPT plugin manifest file containing metadata and API specification details
-/plugins/logo.jpg         # The logo image file for the plugin, referenced in the manifest file
-/plugins/openapi.yaml     # The OpenAPI (Swagger) specification file describing the plugin's API endpoints
-/templates/index.html     # The HTML template for the main page where users can input a URL for summarization
-/templates/summary.html   # The HTML template for displaying the summarized content to the user
-/readme.md                # The README file containing documentation and instructions for using the plugin
-/requirements.txt         # The file listing the Python dependencies required to run the application
-```
-### Step 1: Setting Up the Environment
-To build the AI Surfer plugin, we'll use Python and the FastAPI framework. We'll also use libraries such as openai, requests, bs4 (BeautifulSoup), spacy, and httpx. Make sure to install these libraries and set up your environment.
-
-### Step 2: Defining the FastAPI Application
-We'll create a FastAPI application with endpoints for summarizing URLs and displaying summaries. The application will use the GPT-3.5 Turbo model to generate summaries in bullet points.
-
-### Step 3: Implementing the Summarization Logic
-The summarization logic involves fetching the HTML content of a URL, extracting the text content, and using the GPT-3.5 Turbo model to generate summaries. We'll use concurrent API connections to process article chunks simultaneously and limit token counts.
-
-### Step 4: Creating the Plugin Manifest (ai-plugin.json)
-The plugin manifest file describes the plugin's metadata, authentication, and API specification. The manifest includes fields such as name_for_human, description_for_model, auth, and api. The auth field specifies the authentication type (e.g., "none" for no authentication).
-
-### Step 5: Creating the OpenAPI Specification (specification.yaml)
-The OpenAPI specification documents the API endpoints of the plugin. It defines the paths, parameters, and responses for each endpoint. ChatGPT uses this specification to understand how to interact with the plugin's API.
-
-### Step 6: Deploying the Plugin
-The AI Surfer plugin can be deployed to Replit for free or to other cloud services. Make sure to set up environment variables (e.g., OpenAI API key) and configure the domain name in the manifest file.
-
-## Buidl
-Building a ChatGPT plugin is a great way to extend the capabilities of ChatGPT and provide users with new and exciting functionalities. The AI Surfer plugin is just one example of how plugins can be used to enhance the ChatGPT experience. Whether you're a beginner or an experienced developer, building ChatGPT plugins is a rewarding and creative endeavor.
-
-For more information on ChatGPT plugins, including authentication options, manifest fields, and OpenAPI specifications, please refer to the official ChatGPT plugin documentation. 
-
-Or try my Plugin Creator Bot. 
-https://github.com/ruvnet/Bot-Generator-Bot/blob/main/prompts/chatgpt-plugin-generator.txt
-
-*Note: This blog post is a high-level overview of building a ChatGPT plugin. For detailed code implementation, please refer to the AI Surfer plugin code provided earlier in this conversation.*
-
-## Deploying the AI Surfer Plugin
-
-To deploy the AI Surfer plugin, you can use Replit or any other cloud service of your choice. Here are the steps to deploy the plugin on Replit:
-
-1. Create a new Replit project and upload the AI Surfer plugin code.
-2. Set up environment variables in Replit, including the OpenAI API key (`OPENAI_API_KEY`) and the domain name (`DOMAIN_NAME`).
-3. Update the `domain_name` variable in the code to use the Replit secret: `domain_name = os.getenv("DOMAIN_NAME")`.
-4. Run the FastAPI application on Replit.
-
-Once deployed, you can access the AI Surfer plugin using the provided URL and start summarizing articles.
-
-In this blog post, we explored how to build a ChatGPT plugin called AI Surfer that allows ChatGPT to surf the internet and summarize articles. We discussed the implementation details, including fetching HTML content, extracting text, generating summaries using GPT-3.5 Turbo, and deploying the plugin to Replit.
-
-Building ChatGPT plugins is an exciting way to extend the capabilities of ChatGPT and provide users with new functionalities. Whether you're summarizing articles, translating text, or fetching
-
-# Appendix
-## FastAPI 
-
-FastAPI is a modern, fast (high-performance) web framework for building APIs with Python. It is designed to be easy to use, while also providing high performance and robustness. FastAPI is built on top of Starlette for web routing and Pydantic for data validation and serialization. It offers a wide range of features, including automatic generation of OpenAPI and JSON Schema documentation, dependency injection, OAuth2 and JWT authentication, and more.
-
-In the AI Web Surfer plugin, FastAPI is used to create the web application and API endpoints that interact with OpenAI's GPT-3.5 Turbo language model. The plugin leverages FastAPI's asynchronous capabilities to efficiently handle concurrent requests and summarize long articles. FastAPI's automatic generation of OpenAPI documentation is also utilized to expose the API specification for the plugin, making it compatible with ChatGPT's plugin system.
-
-One of the key benefits of using FastAPI is its comprehensive and well-organized documentation. The official FastAPI documentation provides detailed explanations, code examples, and best practices for building web applications and APIs. Whether you are a beginner or an experienced developer, the documentation is a valuable resource for learning how to use FastAPI effectively.
-
-To explore the FastAPI documentation and learn more about its features, you can visit the official website: https://fastapi.tiangolo.com/
-
-In summary, FastAPI is a powerful and versatile web framework that plays a crucial role in building the AI Web Surfer plugin. By using FastAPI, developers can create high-performance web applications and APIs that seamlessly integrate with ChatGPT and other AI language models.
+Whether you're a data scientist, NLP researcher, or developer, the Hugging Face API plugin for ChatGPT offers a powerful and convenient way to enhance your NLP workflows and interactions.

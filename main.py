@@ -1,151 +1,427 @@
-#              - Ai Surfer 
+#              - chatgpt-huggingface-plugin 
 #     /\__/\   - main.py 
 #    ( o.o  )  - v0.0.1
 #      >^<     - by @rUv
 
-# Import the necessary modules and libraries
-import os               # Provides access to operating system-dependent functionality
-import openai           # OpenAI's GPT-3 language model library
-import requests         # Library for making HTTP requests
-from bs4 import BeautifulSoup  # Library for web scraping and parsing HTML/XML documents
-from fastapi import FastAPI, Request  # FastAPI framework and Request object
-from fastapi.responses import HTMLResponse  # HTML response class for FastAPI
-from fastapi.templating import Jinja2Templates  # Templating engine for rendering HTML
-from dataclasses import dataclass  # Utility for creating data classes
-import spacy            # Library for natural language processing (NLP)
-import asyncio          # Library for asynchronous programming
-import httpx            # Library for making asynchronous HTTP requests
-from fastapi.responses import FileResponse  # File response class for FastAPI
-import mimetypes        # Library for determining the MIME type of a file
+import httpx
+import json
+import logging
+import mimetypes
+import os
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.responses import FileResponse, JSONResponse
+from pydantic import BaseModel, validator
+from typing import List, Optional
 
-# Define an asynchronous function to fetch the HTML content of a URL
-async def fetch_html(url: str) -> str:
-    response = requests.get(url)  # Make an HTTP GET request to the URL
-    return response.text          # Return the text content of the response
 
-# Create a FastAPI application instance
 app = FastAPI()
 
-# Create a Jinja2Templates instance for rendering HTML templates
-templates = Jinja2Templates(directory="templates")
+HUGGINGFACE_API_KEY = os.environ["HUGGINGFACE_API_KEY"]
+HUGGINGFACE_BASE_URL = "https://huggingface.co"
+# HUGGINGFACE_BASE_URL = "https://api.endpoints.huggingface.cloud"
+logging.basicConfig(level=logging.DEBUG)
 
-# Set the OpenAI API key from the environment variable
-openai.api_key = os.getenv("OPENAI_API_KEY")
+@app.get("/api/models/{repo_id}", description="Get all information for a specific model.")
+async def model_info(repo_id: str):
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/models/{repo_id}"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
 
-# Load the spaCy language model for English
-nlp = spacy.load("en_core_web_sm")
-
-# Define a data class to represent the URL data
-@dataclass
-class URLData:
-    url: str  # URL string
-
-# Define a function to extract Open Graph description data from a URL
-def extract_opengraph_data(url):
-    response = requests.get(url)  # Make an HTTP GET request to the URL
-    soup = BeautifulSoup(response.content, "html.parser")  # Parse the HTML content of the response
-    og_description = soup.find("meta", property="og:description")  # Find the Open Graph description meta tag
-    # Return the content of the Open Graph description tag, if it exists, otherwise return None
-    return og_description.get("content") if og_description else None
-
-# Define a function to extract text content from an HTML string
-def extract_text(url_content):
-    soup = BeautifulSoup(url_content, "html.parser")  # Parse the HTML content
-    text_parts = []  # Initialize an empty list to store text parts
-    # Iterate over all <p> and <div> elements in the HTML and extract their text content
-    for p in soup.find_all(["p", "div"]):
-        text_parts.append(p.text)
-    # Join the text parts with newline characters and return the result
-    return "\n".join(text_parts)
-
-# Define a function to extract keywords from a text string
-def extract_keywords(text, num_keywords=5):
-    doc = nlp(text)  # Process the text using the spaCy language model
-    keywords = []  # Initialize an empty list to store keywords
-    # Iterate over named entities in the text and extract keywords based on entity labels
-    for ent in doc.ents:
-        if ent.label_ in ["ORG", "PERSON", "GPE", "NORP"]:
-            keywords.append(ent.text)
-    # Iterate over tokens in the text and extract keywords based on part-of-speech tags
-    for token in doc:
-        if token.is_stop or token.is_punct:
-            continue  # Skip stop words and punctuation
-        if token.pos_ in ["NOUN", "ADJ", "VERB"] and len(keywords) < num_keywords:
-            keywords.append(token.text)
-    return keywords
-
-# Define an asynchronous function to generate a summary of a text chunk using GPT-3
-async def generate_summary_chunk(chunk):
-    # Define the conversation messages for the GPT-3 model
-    messages = [
-        {"role": "system", "content": "You are an AI language model tasked with summarizing articles in bullet points."},
-        {"role": "user", "content": f"Here's an article chunk to summarize:\n\n{chunk}\n\n"},
-        {"role": "user", "content": "Provide the most interesting and important elements in an easy to understand way."}
-    ]
-    
-    # Use an asynchronous HTTP client to make a POST request to the OpenAI API
     async with httpx.AsyncClient() as client:
-        response = await client.post(
-            "https://api.openai.com/v1/chat/completions",  # API endpoint
-            json={
-                "model": "gpt-3.5-turbo-0301",  # Model name
-                "messages": messages,  # Conversation messages
-                "max_tokens": 100,  # Maximum number of tokens in the response
-                "temperature": 0.9,  # Sampling temperature
-                "n": 1,  # Number of completions to generate
-                "stream": False,  # Streaming mode
-                "stop": None,  # Stop sequence
-            },
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {openai.api_key}",  # API key for authorization
-        },
-    )
+        response = await client.get(api_url, headers=headers)
 
-    response_data = response.json()
-    summary = response_data['choices'][0]['message']['content'].strip()
-    return summary  # Return the summary text
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
 
-# Define an asynchronous function to generate a summary of an entire article
-async def generate_summary(url):
-    url_content = await fetch_html(url)  # Fetch the HTML content of the URL
-    article = extract_text(url_content)  # Extract the text content from the HTML
-    keywords = extract_keywords(article)  # Extract keywords from the article text
+    return response.json()
+
+@app.get("/api/models/{repo_id}/revision/{revision}", description="Get information for a specific model revision.")
+async def model_info_revision(repo_id: str, revision: str):
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/models/{repo_id}/revision/{revision}"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(api_url, headers=headers)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
+
+@app.get("/api/datasets-tags-by-type", description="Gets all the available dataset tags hosted in the Hub")
+async def get_dataset_tags():
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/datasets-tags-by-type"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(api_url, headers=headers)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
+
+@app.get("/api/spaces", description="Get information from all Spaces in the Hub.")
+async def list_spaces(
+    search: Optional[str] = None,
+    author: Optional[str] = None,
+    filter: Optional[str] = None,
+    sort: Optional[str] = None,
+    direction: Optional[str] = None,
+    limit: Optional[int] = 10,
+    full: Optional[bool] = None,
+    config: Optional[bool] = None,
+):
+    params = {
+        "search": search,
+        "author": author,
+        "filter": filter,
+        "sort": sort,
+        "direction": direction,
+        "limit": limit,
+        "full": full,
+        "config": config,
+    }
+    params = {k: v for k, v in params.items() if v is not None}
     
-    chunk_size = 2800  # Define the maximum size of each article chunk
-    # Split the article into chunks based on the defined chunk size
-    article_chunks = [article[i:i + chunk_size] for i in range(0, len(article), chunk_size)]
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/spaces"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
 
-    # Use concurrency to process chunks simultaneously and generate summaries for each chunk
-    summaries = await asyncio.gather(*(generate_summary_chunk(chunk) for chunk in article_chunks))
-    
-    final_summary = "\n".join(summaries)  # Join the summaries to form the final summary
-    return final_summary  # Return the final summary
+    async with httpx.AsyncClient() as client:
+        response = await client.get(api_url, headers=headers, params=params)
 
-# Define a route for the root URL ("/") that renders the index.html template
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
 
-# Define a route for the "/api/summarize" endpoint that summarizes a given URL
-@app.post("/api/summarize")
-async def summarize_url(url_data: URLData):
-  # Access the DOMAIN_NAME secret from the Replit environment
-    domain_name = os.getenv("DOMAIN_NAME")
-    og_description = extract_opengraph_data(url_data.url)  # Extract Open Graph description
-    url_content = await fetch_html(url_data.url)  # Fetch the HTML content of the URL
-    article = extract_text(url_content)  # Extract the text content from the HTML
-    # Generate the summary using the Open Graph description or the generate_summary function
-    summary = og_description if og_description else await generate_summary(url_data.url)
-    keywords = extract_keywords(article)  # Extract keywords from the article text
-    return {"summary": summary}  # Return the summary as a JSON response
+    return response.json()
 
-# Define a route for the "/summary" endpoint that displays the summary
-@app.get("/summary", response_class=HTMLResponse)
-async def display_summary(request: Request):
-    summary = request.query_params.get("summary", "No summary provided.")
-    return templates.TemplateResponse("summary.html", {"request": request, "summary": summary})
+@app.get("/api/spaces/{repo_id}", description="Get all information for a specific space.")
+@app.get("/api/spaces/{repo_id}/revision/{revision}", description="Get all information for a specific space at a specific revision.")
+async def space_info(repo_id: str, revision: Optional[str] = None):
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/spaces/{repo_id}"
+    if revision:
+        api_url += f"/revision/{revision}"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
 
+    async with httpx.AsyncClient() as client:
+        response = await client.get(api_url, headers=headers)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
+
+@app.get("/api/metrics", description="Get information from all metrics in the Hub.")
+async def list_metrics():
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/metrics"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(api_url, headers=headers)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
+
+class CreateRepoRequest(BaseModel):
+    type: Optional[str] = None
+    name: str
+    organization: Optional[str] = None
+    private: Optional[bool] = False
+
+class DeleteRepoRequest(BaseModel):
+    type: str
+    # repo_id: str
+    name: str  # Add the "name" field to the request model
+
+
+class UpdateRepoVisibilityRequest(BaseModel):
+    private: bool
+
+class MoveRepoRequest(BaseModel):
+    fromRepo: str
+    toRepo: str
+
+class CreateSpaceRequest(BaseModel):
+    type: str
+    name: str
+    private: bool
+    sdk: str
+
+@app.post("/api/repos/create", description="Create a new space in the Hugging Face Model Hub. The 'sdk' field must be one of ['streamlit', 'gradio', 'docker', 'static'].")
+async def create_space(create_space_request: CreateSpaceRequest):
+    try:
+        # Construct the URL for the endpoint
+        api_url = f"{HUGGINGFACE_BASE_URL}/api/repos/create"
+        headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+        # Convert the request payload to a dictionary
+        data = create_space_request.dict()
+        async with httpx.AsyncClient() as client:
+            response = await client.post(api_url, headers=headers, json=data)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.text)
+
+        return response.json()
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/repos/delete/{name}", description="Delete a repository in the Hugging Face Model Hub.")
+async def delete_repo(name: str, request: DeleteRepoRequest):
+    try:
+        # Construct the URL for the endpoint
+        api_url = f"{HUGGINGFACE_BASE_URL}/api/repos/delete/{name}"
+        headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+        async with httpx.AsyncClient() as client:
+            response = await client.request(
+                method="DELETE", url=api_url, headers=headers, json=request.dict()
+            )
+
+        if response.status_code != 200:
+            logging.error(f"Error response from Hugging Face API: {response.text}")
+            return JSONResponse(status_code=response.status_code, content=response.text)
+
+        return response.json()
+
+    except Exception as e:
+        logging.exception("An error occurred while processing the request")
+        return JSONResponse(status_code=500, content={"detail": str(e)})
+
+
+@app.put("/api/repos/{type}/{repo_id}/settings", description="Update repo visibility.")
+async def update_repo_visibility(type: str, repo_id: str, request: UpdateRepoVisibilityRequest):
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/repos/{type}/{repo_id}/settings"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.put(api_url, headers=headers, json=request.dict())
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
+
+@app.post("/api/repos/move", description="Move a repository (rename within same namespace or transfer from user to organization).")
+async def move_repo(request: MoveRepoRequest):
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/repos/move"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(api_url, headers=headers, json=request.dict())
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
+
+from fastapi import UploadFile, File
+
+@app.post("/api/{type}/{repo_id}/upload/{revision}/{path_in_repo}", description="Upload a file to a specific repository.")
+async def upload_file(type: str, repo_id: str, revision: str, path_in_repo: str, file: UploadFile = File(...)):
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/{type}/{repo_id}/upload/{revision}/{path_in_repo}"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(api_url, headers=headers, content=file.file.read())
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
+
+@app.get("/api/whoami-v2", description="Get username and organizations the user belongs to.")
+async def whoami():
+    api_url = f"{HUGGINGFACE_BASE_URL}/api/whoami-v2"
+    headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(api_url, headers=headers)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
+
+
+class InferenceRequest(BaseModel):
+    text: str
+    model: str
+
+class ComputeScaling(BaseModel):
+    maxReplica: int
+    minReplica: int
+
+class Compute(BaseModel):
+    accelerator: str
+    instanceSize: str
+    instanceType: str
+    scaling: ComputeScaling
+
+class Image(BaseModel):
+    huggingface: dict
+
+class Model(BaseModel):
+    framework: str
+    image: Image
+    repository: str
+    revision: str
+    task: str
+
+class Provider(BaseModel):
+    region: str
+    vendor: str
+
+class EndpointInput(BaseModel):
+    accountId: Optional[str] = None
+    compute: Compute
+    model: Model
+    name: str
+    provider: Provider
+    type: str
+
+class ModelImage(BaseModel):
+    huggingface: dict
+
+class ModelData(BaseModel):
+    framework: str
+    image: ModelImage
+    repository: str
+    revision: str
+    task: str
+
+class Scaling(BaseModel):
+    maxReplica: int
+    minReplica: int
+
+class ComputeData(BaseModel):
+    accelerator: str
+    instanceSize: str
+    instanceType: str
+    scaling: Scaling
+
+class UpdateEndpointPayload(BaseModel):
+    compute: ComputeData
+    model: ModelData
+
+@app.put("/endpoint/{name}", description="Update an endpoint with the provided JSON payload.")
+async def update_endpoint(name: str, payload: UpdateEndpointPayload):
+    # Process the request and update the endpoint with the provided data.
+    # Replace the following line with your actual implementation.
+    response = {"message": f"Endpoint '{name}' updated successfully.", "data": payload}
+
+    return response
+
+@app.post("/endpoint", description="Create an endpoint with the given configuration.")
+async def create_endpoint(payload: EndpointInput):
+    # Process the payload and perform the required actions.
+    # For now, just return the input payload as is.
+    return payload
+
+@app.delete("/endpoint/{name}", description="Delete an endpoint with the specified name.")
+async def delete_endpoint(name: str):
+    # Process the request and delete the endpoint with the specified name.
+    # Replace the following line with your actual implementation.
+    response = {"message": f"Endpoint '{name}' deleted successfully."}
+
+    return response
+
+@app.get("/endpoint/{endpoint_id}", description="Get information about a specific endpoint.")
+async def get_endpoint(endpoint_id: str):
+    api_url = f"{HUGGINGFACE_BASE_URL}/endpoint/{endpoint_id}"
+    headers = {"Accept": "application/json", "Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(api_url, headers=headers)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
+    return response.json()
+
+
+@app.get("/list_models/", description="List all available models in the Hugging Face Model Hub.")
+async def list_models(
+    search: Optional[str] = None,
+    author: Optional[str] = None,
+    filter: Optional[str] = None,
+    sort: Optional[str] = None,
+    direction: Optional[str] = None,
+    limit: Optional[int] = 10,
+    full: Optional[bool] = False,
+    config: Optional[bool] = False,
+):
+    try:
+        api_url = "https://huggingface.co/api/models"
+        
+        query_params = {
+            "search": search,
+            "author": author,
+            "filter": filter,
+            "sort": sort,
+            "direction": direction,
+            "limit": limit,
+            "full": full,
+            "config": config,
+        }
+        
+        query_params = {k: v for k, v in query_params.items() if v is not None}
+        
+        headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(api_url, headers=headers, params=query_params)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail=response.text)
+
+        return response.json()
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/endpoint/{name}/logs", description="Get logs for the specified endpoint.")
+async def get_endpoint_logs(name: str):
+    # Process the request and fetch the logs for the specified endpoint.
+    # Replace the following line with your actual implementation.
+    response = {"message": f"Logs for endpoint '{name}'."}
+
+    return response
+
+@app.get("/endpoint/{name}/metrics", description="Get metrics for the specified endpoint.")
+async def get_endpoint_metrics(name: str):
+    # Process the request and fetch the metrics for the specified endpoint.
+    # Replace the following line with your actual implementation.
+    response = {"message": f"Metrics for endpoint '{name}'."}
+
+    return response
+
+@app.get("/provider", description="Get provider information.")
+async def get_provider():
+    # Process the request and fetch provider information.
+    # Replace the following line with your actual implementation.
+    response = {"message": "Provider information."}
+
+    return response
+
+@app.get("/provider/{vendor}/region", description="Get regions for the specified provider.")
+async def get_provider_regions(vendor: str):
+    # Process the request and fetch regions for the specified provider.
+    # Replace the following line with your actual implementation.
+    response = {"message": f"Regions for provider '{vendor}'."}
+
+    return response
+
+@app.get("/provider/{vendor}/region/{region}/compute", description="Get compute information for the specified provider and region.")
+async def get_provider_region_compute(vendor: str, region: str):
+    # Process the request and fetch compute information for the specified provider and region.
+    # Replace the following line with your actual implementation.
+    response = {"message": f"Compute information for provider '{vendor}' in region '{region}'."}
+
+    return response
+
+# Additional endpoints can be added here as needed...
 # Define a route for serving files from the ".well-known" path
 @app.get('/.well-known/{filename}')
 async def download(filename: str):

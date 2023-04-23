@@ -1,17 +1,35 @@
-# Python files
+# .gitignore
+
+# Ignore Python compiled files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Replit files
+# Ignore virtual environment files
+venv/
+*.venv
+env/
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore log files
+*.log
+
+# Ignore build and distribution files
+build/
+dist/
+*.egg-info/
+
+# Ignore other common files
+.DS_Store
+*.bak
+*.tmp
+
+# Ignore Replit specific files
 .replit
-.replit_history
-.replit_user_data
-
-# Environments
-.env
-*.env
-
-# Flask sessions
-instance/
+.replit-debugger
