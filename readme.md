@@ -4,17 +4,17 @@
 Hugging Face is a platform that provides a wide range of natural language processing (NLP) models, datasets, and tools. With the Hugging Face API plugin, you can seamlessly integrate the capabilities of the Hugging Face platform into ChatGPT. This plugin allows ChatGPT to interact with Hugging Face models, datasets, and spaces, enabling a variety of NLP tasks such as text classification, language translation, summarization, and more.
 
 ## Use Cases
-- Model Information Retrieval: Use the plugin to retrieve information about specific models hosted on the Hugging Face platform.
-- Dataset Exploration: Access and explore the datasets hosted on Hugging Face.
-- Retrieve information about specific datasets and their metadata.
-- Space Management: Create, access, and manage Hugging Face Spaces through natural language interactions with ChatGPT.
-- Model Deployment: Deploy your NLP models to Hugging Face and manage them using the plugin.
+- **Model Information Retrieval:** Use the plugin to retrieve information about specific models hosted on the Hugging Face platform.
+- **Dataset Exploration:** Access and explore the datasets hosted on Hugging Face.
+- **Retrieve information:** about specific datasets and their metadata.
+- **Space Management:** Create, access, and manage Hugging Face Spaces through natural language interactions with ChatGPT.
+- **Model Deployment:** Deploy your NLP models to Hugging Face and manage them using the plugin.
 
 ## Benefits of the Hugging Face API Plugin
-- Manage Models and Datasets: The plugin allows you to manage your Hugging Face models and datasets through natural language interactions with ChatGPT. You can retrieve information about specific models, list datasets, and perform other management tasks.
-- Interact with Hugging Face Spaces: Hugging Face Spaces are interactive web applications that showcase models and datasets. The plugin enables you to create, access, and manage these spaces.
-- Convenient and Intuitive: The plugin provides a convenient and intuitive way to interact with the Hugging Face platform. Users can perform complex tasks using simple natural language commands.
-- Enhanced Capabilities: By integrating the Hugging Face platform into ChatGPT, you can enhance the language model's capabilities, allowing users to leverage the vast collection of models and resources available on Hugging Face.
+- **Manage Models and Datasets:** The plugin allows you to manage your Hugging Face models and datasets through natural language interactions with ChatGPT. You can retrieve information about specific models, list datasets, and perform other management tasks.
+- **Interact with Hugging Face Spaces:** Hugging Face Spaces are interactive web applications that showcase models and datasets. The plugin enables you to create, access, and manage these spaces.
+- **Convenient and Intuitive:** The plugin provides a convenient and intuitive way to interact with the Hugging Face platform. Users can perform complex tasks using simple natural language commands.
+- **Enhanced Capabilities:** By integrating the Hugging Face platform into ChatGPT, you can enhance the language model's capabilities, allowing users to leverage the vast collection of models and resources available on Hugging Face.
 
 ## How to Use Examples
 
